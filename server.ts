@@ -4,7 +4,6 @@ import path from 'node:path';
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import multer from 'multer';
-import { createServer as createViteServer } from 'vite';
 import {
   deleteInspectionById,
   getDashboardMetrics,
@@ -383,19 +382,21 @@ export async function createApp() {
   app.get('/api/samples', (_req: Request, res: Response) => {
     const items = SAMPLE_CATALOG.map((item) => ({
       ...item,
-      url: `/src/assets/images/${item.filename}`,
+      url: `/samples/${item.filename}`,
     }));
     res.json({ items });
   });
 
-  // Frontend serving (Vite dev middleware or production dist)
-  if (process.env.NODE_ENV !== 'production') {
+  // Frontend serving (Vite dev middleware or standalone production dist; Vercel serves dist via CDN)
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    const vitePkg = 'vite';
+    const { createServer: createViteServer } = (await import(vitePkg)) as typeof import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
+  } else if (!process.env.VERCEL) {
     const distDir = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distDir));
     app.get('*', (_req: Request, res: Response) => {
@@ -411,9 +412,10 @@ export async function createApp() {
   return app;
 }
 
-// Start server when executed directly
+// Start server when executed directly outside serverless environments
 const isMain =
-  process.argv[1] &&
+  !process.env.VERCEL &&
+  Boolean(process.argv[1]) &&
   (process.argv[1].endsWith('server.ts') || process.argv[1].endsWith('server.js'));
 
 if (isMain) {

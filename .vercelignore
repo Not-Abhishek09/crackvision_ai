@@ -1,0 +1,10 @@
+backend
+backend/
+data/
+storage/
+public/assets/aistudio/
+.env
+.env.*
+!.env.example
+*.db
+*.db-*

@@ -169,7 +169,11 @@ export function getStorageProvider(): StorageProvider {
       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || undefined,
     });
   } else {
-    const root = process.env.STORAGE_ROOT || path.resolve(process.cwd(), 'data', 'storage');
+    const root =
+      process.env.STORAGE_ROOT ||
+      (process.env.VERCEL
+        ? path.join('/tmp', 'storage')
+        : path.resolve(process.cwd(), 'data', 'storage'));
     cachedStorage = new LocalDiskStorageProvider(root);
   }
 

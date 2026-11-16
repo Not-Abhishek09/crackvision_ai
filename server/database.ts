@@ -47,7 +47,13 @@ interface RawInspectionRow {
 let dbInstance: Database.Database | null = null;
 
 export function getDbPath(): string {
-  return path.resolve(process.env.DB_PATH || path.join(process.cwd(), 'data', 'construction_vision.db'));
+  if (process.env.DB_PATH) {
+    return path.resolve(process.env.DB_PATH);
+  }
+  if (process.env.VERCEL) {
+    return path.join('/tmp', 'construction_vision.db');
+  }
+  return path.resolve(path.join(process.cwd(), 'data', 'construction_vision.db'));
 }
 
 export function getDb(): Database.Database {
