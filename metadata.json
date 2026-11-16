@@ -1,0 +1,6 @@
+{
+  "name": "Construction Vision",
+  "description": "AI-driven construction site structural crack detection, worker safety helmet compliance monitoring, and automated PDF inspection reporting.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
